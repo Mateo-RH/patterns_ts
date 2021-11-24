@@ -3,6 +3,7 @@ abstract class Command<State> {
   abstract excecute(state: State): State;
   abstract undo(state: State): State;
 }
+//new changes
 
 class CommandStack<State> {
   private stack: Command<State>[] = [];
