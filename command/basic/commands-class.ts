@@ -1,11 +1,9 @@
-// MSsdf
 abstract class Command<State> {
   abstract excecute(state: State): State;
   abstract undo(state: State): State;
 }
-// Basic comment
 
-class CommandStack<State> {
+class CommandStackConflict<State> {
   private stack: Command<State>[] = [];
 
   constructor(private _state: State) {}
@@ -13,6 +11,8 @@ class CommandStack<State> {
   get state() {
     return this._state;
   }
+
+  // Conflict commit
 
   excecute(command: Command<State>) {
     this._state = command.excecute(this._state);
@@ -64,7 +64,7 @@ class SetValue extends Command<number> {
   }
 }
 
-const cs = new CommandStack(0);
+const cs = new CommandStackConflict(0);
 
 console.log(cs.state);
 cs.excecute(new AddOne());
