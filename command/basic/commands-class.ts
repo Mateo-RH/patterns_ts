@@ -15,8 +15,10 @@ class CommandStackConflict<State> {
   // Conflict commit
 
   excecute(command: Command<State>) {
-    this._state = command.excecute(this._state);
+    const a = 1 + 2;
     this.stack.push(command);
+    this._state = command.excecute(this._state);
+    return a;
   }
 
   undo() {
@@ -46,38 +48,3 @@ class SubtractOne extends Command<number> {
     return state + 1;
   }
 }
-
-class SetValue extends Command<number> {
-  private _originalValue?: number;
-
-  constructor(private value: number) {
-    super();
-  }
-
-  excecute(state: number) {
-    this._originalValue = state;
-    return this.value;
-  }
-
-  undo() {
-    return this._originalValue!;
-  }
-}
-
-const cs = new CommandStackConflict(0);
-
-console.log(cs.state);
-cs.excecute(new AddOne());
-console.log(cs.state);
-cs.undo();
-console.log(cs.state);
-
-cs.excecute(new SubtractOne());
-console.log(cs.state);
-cs.undo();
-console.log(cs.state);
-
-cs.excecute(new SetValue(42));
-console.log(cs.state);
-cs.undo();
-console.log(cs.state);
