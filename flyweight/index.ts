@@ -11,16 +11,35 @@ interface PokemonList {
   count: number;
   next: string;
   previous?: any;
-  results: {
-    name: string;
-    url: string;
-  }[];
+  results: { name: string; url: string }[];
+}
+
+function makeURLFlyweights<ReturnType>(urls: Record<string, string>) {
+  const myObject: Record<string, Promise<ReturnType>> = {};
+
+  return new Proxy(myObject, {
+    get: (target, name: string) => {
+      console.log(`Fetching ${name} ${urls[name]}`);
+      if (!target[name]) {
+        target[name] = fetch(urls[name]).then((res) => res.json());
+      }
+      return target[name];
+    },
+  });
 }
 
 (async () => {
   const pokemon = (await (
-    await fetch("https://pokeapi.co/api/v2/pokemon?limit=10/")
+    await fetch("https://pokeapi.co/api/v2/pokemon?limit=20/")
   ).json()) as PokemonList;
 
-  console.log(pokemon);
+  const urls = pokemon.results.reduce(
+    (acc, { name, url }) => ({ ...acc, [name]: url }),
+    {}
+  );
+
+  console.log(urls);
+  const lookUp = makeURLFlyweights<Pokemon>(urls);
+  const data = await lookUp.bulbasaur;
+  console.log(data.species);
 })();
